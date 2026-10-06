@@ -1,0 +1,12 @@
+node_modules
+.output
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+.vinxi
+.nitro
+dist
+public/ort
+eval-results

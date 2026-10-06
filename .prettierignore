@@ -1,0 +1,8 @@
+.output
+node_modules
+pnpm-lock.yaml
+src/routeTree.gen.ts
+dist
+.nitro
+public/ort
+eval-results

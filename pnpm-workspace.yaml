@@ -1,0 +1,8 @@
+# pnpm 11 refuses to run dependency install scripts unless they are decided explicitly.
+allowBuilds:
+  "@google/genai": false
+  esbuild: true
+  # Browser-only use of ONNX Runtime: the Node build and its large downloads are not needed.
+  onnxruntime-node: false
+  protobufjs: false
+  sharp: false
