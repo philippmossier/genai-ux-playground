@@ -14,13 +14,48 @@ env.allowLocalModels = false;
 env.useBrowserCache = true;
 
 // The 64-bit JSPI build can parse single files over ~1 GB; the 32-bit one fails with std::bad_alloc.
-const suffix = "Suspending" in WebAssembly ? ".jspi" : ".asyncify";
+const FLAVOR = "Suspending" in WebAssembly ? "jspi" : "asyncify";
+const suffix = `.${FLAVOR}`;
+/** Runtime builds stored as two parts by scripts/copy-ort.mjs (see ensureRuntime). */
+const SPLIT_WASM = new Set(["asyncify"]);
 const wasm = env.backends.onnx.wasm;
 if (wasm) {
-  wasm.wasmPaths = {
-    mjs: `${self.location.origin}/ort/ort-wasm-simd-threaded${suffix}.mjs`,
-    wasm: `${self.location.origin}/ort/ort-wasm-simd-threaded${suffix}.wasm`,
-  };
+  const base = `${self.location.origin}/ort/ort-wasm-simd-threaded${suffix}`;
+  // A split binary must not have a `wasm` path: Transformers.js would fetch that URL itself and overwrite
+  // the joined binary with whatever comes back (a static host answers a missing file with index.html).
+  wasm.wasmPaths = SPLIT_WASM.has(FLAVOR)
+    ? { mjs: `${base}.mjs` }
+    : { mjs: `${base}.mjs`, wasm: `${base}.wasm` };
+}
+
+/**
+ * Static hosts cap the size of one file (Cloudflare: 25 MiB) and the asyncify build is about 27 MB, so
+ * scripts/copy-ort.mjs stores it as two parts. They are fetched from this origin like the rest of the runtime
+ * and joined before the runtime starts.
+ */
+let runtimeReady: Promise<void> | null = null;
+function ensureRuntime(): Promise<void> {
+  runtimeReady ??= (async () => {
+    if (!wasm || !SPLIT_WASM.has(FLAVOR)) return;
+    const url = `${self.location.origin}/ort/ort-wasm-simd-threaded${suffix}.wasm`;
+    const parts = await Promise.all(
+      [0, 1].map(async (i) => {
+        const res = await fetch(`${url}.part${i}`);
+        if (!res.ok)
+          throw new Error(`Could not load the WebAssembly runtime (${res.status}).`);
+        return new Uint8Array(await res.arrayBuffer());
+      }),
+    );
+    const joined = new Uint8Array(parts[0]!.length + parts[1]!.length);
+    joined.set(parts[0]!, 0);
+    joined.set(parts[1]!, parts[0]!.length);
+    // A missing part comes back as index.html with status 200 on most static hosts.
+    if (joined[0] !== 0 || joined[1] !== 0x61 || joined[2] !== 0x73 || joined[3] !== 0x6d)
+      throw new Error("The WebAssembly runtime files are missing on this server.");
+    wasm.wasmBinary = joined;
+  })();
+  runtimeReady.catch(() => (runtimeReady = null));
+  return runtimeReady;
 }
 
 const SAMPLING = {
@@ -36,6 +71,7 @@ const stopping = new InterruptableStoppingCriteria();
 
 async function load(msg: Extract<WorkerRequest, { type: "load" }>) {
   const started = performance.now();
+  await ensureRuntime();
   await model?.dispose();
   model = null;
   family = msg.family;

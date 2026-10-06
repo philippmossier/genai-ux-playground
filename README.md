@@ -9,6 +9,9 @@ The model does not get faster. What changes is **how the request is made** (stre
 schema-constrained or not, one call or several) **and how the result is rendered**. Together they decide
 **when the user sees something they can use**.
 
+**Live demo: [genai-ux-playground.philippmossier.com](https://genai-ux-playground.philippmossier.com)**
+(the mock provider only, so it costs nothing; the on-device models need a browser with WebGPU).
+
 ![Run all five modes and compare](docs/screenshot.png)
 
 Pick a task, pick a model, press **Run all 5 and compare**. Every strategy runs against the same
@@ -202,6 +205,11 @@ providers:
 - behind NGINX, keep the `X-Accel-Buffering: no` header the server sends, otherwise streaming silently
   becomes blocking.
 
+The live demo runs on Cloudflare Workers: `pnpm deploy:cloudflare` builds with the Cloudflare Vite plugin
+(`CLOUDFLARE=1`, see `vite.config.ts` and `wrangler.jsonc`) and deploys with no secrets, so only the mock
+provider is available. The build step deletes the `.dev.vars` copy of `.env` that the plugin makes for local
+previews before anything is uploaded.
+
 On Claude Sonnet 5.5 the server opts into the API's refusal fallback, so a request a safety
 classifier declines is retried on another model instead of failing mid-demo.
 
@@ -211,6 +219,7 @@ classifier declines is retried on another model instead of failing mid-demo.
 | --------------------------- | ---------------------------------------------------------------------------------------------- |
 | `pnpm dev`                  | Dev server on :3000, loads `.env` if present                                                   |
 | `pnpm build` / `pnpm start` | Production build and Node server (Nitro)                                                       |
+| `pnpm deploy:cloudflare`    | Build for Cloudflare Workers and deploy (mock only, no secrets)                                |
 | `pnpm check`                | Prettier, ESLint, TypeScript, tests. Run before finishing a change                             |
 | `pnpm test`                 | Unit tests. No network, no keys                                                                |
 | `pnpm bench`                | **Speed** of all five modes against a running server, as a Markdown table                      |

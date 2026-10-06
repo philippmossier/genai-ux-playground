@@ -6,3 +6,5 @@ allowBuilds:
   onnxruntime-node: false
   protobufjs: false
   sharp: false
+  # The Cloudflare Workers runtime, used by `wrangler dev` and the Cloudflare build.
+  workerd: true

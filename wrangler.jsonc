@@ -1,0 +1,13 @@
+// Cloudflare Workers deployment (`pnpm deploy:cloudflare`). The public demo runs on the mock provider only:
+// no API keys are set here, and real providers stay off unless ALLOW_REAL_PROVIDERS=1 (see .env.example).
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "genai-ux-playground",
+  "compatibility_date": "2025-11-24",
+  "compatibility_flags": ["nodejs_compat"],
+  "main": "@tanstack/react-start/server-entry",
+  "observability": { "enabled": true },
+  "routes": [
+    { "pattern": "genai-ux-playground.philippmossier.com", "custom_domain": true },
+  ],
+}

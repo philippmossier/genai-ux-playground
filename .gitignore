@@ -10,3 +10,6 @@ node_modules
 dist
 public/ort
 eval-results
+
+# Cloudflare (local state of wrangler dev and deploy)
+.wrangler/
