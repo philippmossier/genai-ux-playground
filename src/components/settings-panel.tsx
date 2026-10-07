@@ -3,6 +3,7 @@ import { casesForTask, findCase } from "~/lib/eval";
 import type { ProviderInfo } from "~/lib/protocol";
 import { TASKS } from "~/lib/tasks";
 import { OnDevicePanel } from "./on-device-panel";
+import { PromptDialog } from "./prompt-dialog";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
 import {
   Field,
@@ -206,10 +207,19 @@ export function SettingsPanel(props: {
         )}
 
         <Collapsible className="group/prompts">
-          <CollapsibleTrigger className="flex w-full items-center gap-1 text-sm font-medium">
-            <ChevronRightIcon className="size-4 transition-transform group-data-[open]/prompts:rotate-90" />
-            Prompts
-          </CollapsibleTrigger>
+          <div className="flex items-center gap-1">
+            <CollapsibleTrigger className="flex flex-1 items-center gap-1 text-sm font-medium">
+              <ChevronRightIcon className="size-4 transition-transform group-data-[open]/prompts:rotate-90" />
+              Prompts
+            </CollapsibleTrigger>
+            <PromptDialog
+              system={props.system}
+              user={props.user}
+              caseId={currentCase === "custom" ? null : currentCase}
+              onSystem={props.onSystem}
+              onUser={props.onUser}
+            />
+          </div>
           <CollapsibleContent>
             <FieldGroup className="pt-3">
               <Field>

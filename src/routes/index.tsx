@@ -61,6 +61,7 @@ function Playground() {
   const navigate = useNavigate({ from: Route.fullPath });
   const runner = useRunner();
 
+  const [introOpen, setIntroOpen] = useState(false);
   const [edits, setEdits] = useState<Record<string, { system?: string; user?: string }>>(
     {},
   );
@@ -122,13 +123,26 @@ function Playground() {
     <main className="mx-auto max-w-7xl px-4 py-8">
       <header className="mb-8">
         <h1 className="text-2xl font-semibold tracking-tight">GenAI UX Playground</h1>
-        <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-          Benchmark how an LLM answer reaches the user. Run one prompt through five
-          delivery strategies on Gemini, Claude, GPT or any OpenAI-compatible model, or on
-          a model running in this browser (Qwen3 0.6B, Gemma 4 E2B), and compare time to
-          first content, total time, tokens and correctness side by side, with repeated
-          runs for a median. The model does not get faster: how the request is made and
-          rendered decides when the user sees something usable.
+        <p className="mt-1 max-w-4xl text-sm text-muted-foreground">
+          Benchmark how an LLM answer reaches the user.{" "}
+          {introOpen && (
+            <>
+              Run one prompt through five delivery strategies on Gemini, Claude, GPT or
+              any OpenAI-compatible model, or on a model running in this browser (Qwen3
+              0.6B, Gemma 4 E2B), and compare time to first content, total time, tokens
+              and correctness side by side, with repeated runs for a median. The model
+              does not get faster: how the request is made and rendered decides when the
+              user sees something usable.{" "}
+            </>
+          )}
+          <Button
+            variant="link"
+            className="h-auto p-0 text-sm"
+            aria-expanded={introOpen}
+            onClick={() => setIntroOpen((o) => !o)}
+          >
+            {introOpen ? "less" : "more"}
+          </Button>
         </p>
       </header>
 
