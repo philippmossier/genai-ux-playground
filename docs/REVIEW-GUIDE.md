@@ -92,7 +92,7 @@ A prompt that works for an AI reviewer: _"Review this repository for correctness
 where the README or docs claim more than the code or the tests demonstrate. Use docs/REVIEW-GUIDE.md as a
 map. For every finding give the file and line, a concrete failing scenario, and how you would verify it."_
 
-## Open decisions for the owner
+## Open decisions
 
 - Review and correct the labels, then run the evaluation on the real models and put dated numbers in the README.
 - Decide whether "first content" should require a minimum amount of content (weak spot 2).

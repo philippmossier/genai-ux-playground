@@ -10,8 +10,8 @@ Accepted. The labels themselves are not yet reviewed
 
 The first benchmark measured speed and schema validity. Every structured output was valid and the models still
 disagreed about the same ticket: validity says nothing about whether the content is right. Comparing a small
-on-device model with hosted ones makes that gap the main question. Markus's extraction benchmark in another
-project scored output against a curated expected result, which is the right shape.
+on-device model with hosted ones makes that gap the main question. The usual answer is to score output against a
+curated expected result.
 
 Options: (a) an LLM judge, (b) human rating, (c) deterministic checks against labelled answers.
 
